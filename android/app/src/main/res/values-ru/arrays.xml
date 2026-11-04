@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="volume">
+        <item>Раздельный</item>
+        <item>Только устройство</item>
+        <item>Синхронизированный</item>
+    </string-array>
+    <string-array name="duration">
+        <item>Нет</item>
+        <item>30 секунд</item>
+        <item>1 минута</item>
+        <item>5 минут</item>
+        <item>10 минут</item>
+        <item>30 минут</item>
+    </string-array>
+    <string-array name="bitrate">
+        <item>Настройки сервера</item>
+        <item>Без ограничений</item>
+        <item>64 кбит/с</item>
+        <item>96 кбит/с</item>
+        <item>128 кбит/с</item>
+        <item>160 кбит/с</item>
+        <item>192 кбит/с</item>
+        <item>224 кбит/с</item>
+        <item>256 кбит/с</item>
+        <item>320 кбит/с</item>
+    </string-array>
+    <string-array name="buffer">
+        <item>По умолчанию</item>
+        <item>4 Мб</item>
+        <item>8 Мб</item>
+        <item>16 Мб</item>
+        <item>32 Мб</item>
+    </string-array>
+    <string-array name="rateLimitWhen">
+        <item>Всегда</item>
+        <item>В сотовой сети</item>
+        <item>В тарифицируемой сети</item>
+        <item>В любой сети</item>
+    </string-array>
+</resources>

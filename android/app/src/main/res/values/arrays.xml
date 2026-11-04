@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="volume">
+        <item>Separate</item>
+        <item>Device only</item>
+        <item>Synchronized</item>
+    </string-array>
+    <string-array name="volumeAlias" translatable="false">
+        <item>separate</item>
+        <item>device</item>
+        <item>synchronized</item>
+    </string-array>
+    <string-array name="duration">
+        <item>None</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>30 minutes</item>
+    </string-array>
+    <string-array name="durationAlias" translatable="false">
+        <item>0</item>
+        <item>30</item>
+        <item>60</item>
+        <item>300</item>
+        <item>1800</item>
+    </string-array>
+    <string-array name="output" translatable="false">
+        <item>AAudio</item>
+        <item>OpenSL ES</item>
+    </string-array>
+    <string-array name="outputAlias" translatable="false">
+        <item>aaudio</item>
+        <item>opensles</item>
+    </string-array>
+    <string-array name="bitrate">
+        <item>Use server setting</item>
+        <item>No limit</item>
+        <item>64 kbps</item>
+        <item>96 kbps</item>
+        <item>128 kbps</item>
+        <item>160 kbps</item>
+        <item>192 kbps</item>
+        <item>224 kbps</item>
+        <item>256 kbps</item>
+        <item>320 kbps</item>
+    </string-array>
+    <string-array name="bitrateAlias" translatable="false">
+        <item>-1</item>
+        <item>0</item>
+        <item>64</item>
+        <item>96</item>
+        <item>128</item>
+        <item>160</item>
+        <item>192</item>
+        <item>224</item>
+        <item>256</item>
+        <item>320</item>
+    </string-array>
+    <string-array name="buffer">
+        <item>Default</item>
+        <item>4 Mb</item>
+        <item>8 Mb</item>
+        <item>16 Mb</item>
+        <item>32 Mb</item>
+    </string-array>
+    <string-array name="bufferAlias" translatable="false">
+        <item>0</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+        <item>32</item>
+    </string-array>
+    <string-array name="rateLimitWhen">
+        <item>Always</item>
+        <item>When on cellular network</item>
+        <item>When on metered network</item>
+        <item>When on cellular or metered network</item>
+    </string-array>
+    <string-array name="rateLimitWhenAlias" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+</resources>

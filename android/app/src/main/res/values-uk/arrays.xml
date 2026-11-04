@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="volume">
+        <item>Роздільний</item>
+        <item>Тільки пристрій</item>
+        <item>Синхронізований</item>
+    </string-array>
+    <string-array name="duration">
+        <item>Ні</item>
+        <item>30 секунд</item>
+        <item>1 хвилина</item>
+        <item>5 хвилин</item>
+        <item>10 хвилин</item>
+        <item>30 хвилин</item>
+    </string-array>
+    <string-array name="bitrate">
+        <item>Налаштування сервера</item>
+        <item>Без обмежень</item>
+        <item>64 кбіт/с</item>
+        <item>96 кбіт/с</item>
+        <item>128 кбіт/с</item>
+        <item>160 кбіт/с</item>
+        <item>192 кбіт/с</item>
+        <item>224 кбіт/с</item>
+        <item>256 кбіт/с</item>
+        <item>320 кбіт/с</item>
+    </string-array>
+    <string-array name="buffer">
+        <item>За замовчуванням</item>
+        <item>4 Мб</item>
+        <item>8 Мб</item>
+        <item>16 Мб</item>
+        <item>32 Мб</item>
+    </string-array>
+    <string-array name="rateLimitWhen">
+        <item>Завжди</item>
+        <item>У стільниковій мережі</item>
+        <item>У тарифікованій мережі</item>
+        <item>У будь-якій мережі</item>
+    </string-array>
+</resources>

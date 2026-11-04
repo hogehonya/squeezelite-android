@@ -1,0 +1,11 @@
+.vscode/
+*.o
+*.jks
+__pycache__/
+bugreport*
+/android/app/local.properties
+squeezelite
+squeezelite-pulse
+tools/alsacap
+tools/find_servers
+!squeezelite/
