@@ -2,7 +2,7 @@
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
- *      Ralph Irving 2015-2025, ralph_irving@hotmail.com
+ *      Ralph Irving 2015-2026, ralph_irving@hotmail.com
  *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Additions (c) Paul Hermann, 2015-2025 under the same license terms
+ * Additions (c) Paul Hermann, 2015-2026 under the same license terms
  *   -Control of Raspberry pi GPIO for amplifier power
  *   -Launch script on power status change from LMS
  */
@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "2.0"
 #define MINOR_VERSION "0"
-#define MICRO_VERSION "1541"
+#define MICRO_VERSION "1595"
 
 #if defined(CUSTOM_VERSION)
 #define VERSION MAJOR_VERSION "." MINOR_VERSION "-" MICRO_VERSION STR(CUSTOM_VERSION)
@@ -335,11 +335,14 @@ typedef int64_t   s64_t;
 
 #define mutex_type pthread_mutex_t
 #define mutex_create(m) pthread_mutex_init(&m, NULL)
-#if defined(ANDROID) && __ANDROID_API__ < 28
-#define mutex_create_p(m) pthread_mutex_init(&m, NULL)
+
+#ifdef ANDROID
+extern int pthread_mutexattr_setprotocol_squeezelite(pthread_mutexattr_t* attr, int protocol);
+#define mutex_create_p(m) pthread_mutexattr_t attr; pthread_mutexattr_init(&attr); pthread_mutexattr_setprotocol_squeezelite(&attr, PTHREAD_PRIO_INHERIT); pthread_mutex_init(&m, &attr); pthread_mutexattr_destroy(&attr)
 #else
 #define mutex_create_p(m) pthread_mutexattr_t attr; pthread_mutexattr_init(&attr); pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT); pthread_mutex_init(&m, &attr); pthread_mutexattr_destroy(&attr)
 #endif
+
 #define mutex_lock(m) pthread_mutex_lock(&m)
 #define mutex_unlock(m) pthread_mutex_unlock(&m)
 #define mutex_destroy(m) pthread_mutex_destroy(&m)
@@ -475,6 +478,7 @@ typedef enum { lERROR = 0, lWARN, lINFO, lDEBUG, lSDEBUG } log_level;
 extern void send_output_state_to_app(u8_t spdif, u8_t dac);
 extern void send_volume_to_app(u32_t left, u32_t right);
 extern void send_connection_state_to_app(const char *address);
+extern void send_playback_state_to_app(void);
 extern char * get_ip_str(const struct sockaddr *sa);
 #else
 const char *logtime(void);
@@ -496,6 +500,7 @@ char* strcasestr(const char *haystack, const char *needle);
 char *next_param(char *src, char c);
 u32_t gettime_ms(void);
 void get_mac(u8_t *mac);
+bool is_mac_nz(u8_t *mac);
 void set_nonblock(sockfd s);
 void set_recvbufsize(sockfd s);
 int connect_timeout(sockfd sock, const struct sockaddr *addr, socklen_t addrlen, int timeout);
@@ -663,7 +668,7 @@ typedef enum { FADE_NONE = 0, FADE_CROSSFADE, FADE_IN, FADE_OUT, FADE_INOUT } fa
 #define MONO_RIGHT	0x02
 #define MONO_LEFT	0x01
 #define MAX_SUPPORTED_SAMPLERATES 20
-#define TEST_RATES = { 1536000, 1411200, 768000, 705600, 384000, 352800, 192000, 176400, 96000, 88200, 48000, 44100, 32000, 24000, 22500, 16000, 12000, 11025, 8000, 0 }
+#define TEST_RATES = { 1536000, 1411200, 768000, 705600, 384000, 352800, 192000, 176400, 96000, 88200, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 0 }
 
 struct outputstate {
 	output_state state;

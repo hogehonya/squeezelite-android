@@ -32,6 +32,7 @@ static jobject obj = 0;
 
 extern int PaOpenSLES_ENABLED;
 extern int PaAAudio_ENABLED;
+extern int LibAAudio_init();
 
 static void sighandler(int signum) {
 	slimproto_stop();
@@ -100,6 +101,32 @@ void send_volume_to_app(u32_t left, u32_t right) {
 	}
 }
 
+void send_playback_state_to_app(void) {
+	if (!jvm || !obj || !clazz) {
+		return;
+	}
+	JNIEnv *env;
+	bool detached = JNI_EDETACHED == (*jvm)->GetEnv(jvm, &env, JNI_VERSION_1_6);
+	if (detached) {
+		if (JNI_OK!=(*jvm)->AttachCurrentThread(jvm, &env, NULL)) {
+			LOG_ERROR("Failed to get attach current thread");
+			return;
+		}
+	}
+	jmethodID method = (*env)->GetMethodID(env, clazz, "playbackStateChanged", "()V");
+	if (method) {
+		(*env)->CallVoidMethod(env, obj, method);
+	} else {
+		// A failed GetMethodID leaves an exception pending, and the next JNI call from this
+		// thread would then abort the VM. Happens if the native library is newer than the java.
+		(*env)->ExceptionClear(env);
+		LOG_ERROR("playbackStateChanged not found");
+	}
+	if (detached) {
+		(*jvm)->DetachCurrentThread(jvm);
+	}
+}
+
 void send_connection_state_to_app(const char *address) {
 	if (!jvm || !obj || !clazz) {
 		return;
@@ -123,7 +150,7 @@ void send_connection_state_to_app(const char *address) {
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_lyrion_squeezelite_Library_start(JNIEnv *env, jobject jobj, jstring lms_param, jstring mac_param, jstring name_param, jint idle, jint fixed_vol, jint logging, jint use_opensles, jint mobile_network, jint buffer_size) {
+JNIEXPORT void JNICALL Java_org_lyrion_squeezelite_Library_start(JNIEnv *env, jobject jobj, jstring lms_param, jstring mac_param, jstring name_param, jint idle, jint fixed_vol, jint loglevel, jint mobile_network, jint buffer_size, jint force_opensles) {
 	const char *server = (*env)->GetStringUTFChars(env, lms_param, NULL);
 	const char *mac_str = (*env)->GetStringUTFChars(env, mac_param, NULL);
 	char *output_device = "default";
@@ -143,13 +170,20 @@ JNIEXPORT void JNICALL Java_org_lyrion_squeezelite_Library_start(JNIEnv *env, jo
 	unsigned dsd_delay = 0;
 	dsd_format dsd_outfmt = PCM;
 #endif
-	log_level log_output = logging;
-	log_level log_stream = logging;
-	log_level log_decode = logging;
-	log_level log_slimproto = logging;
+	log_level log_output = loglevel;
+	log_level log_stream = loglevel;
+	log_level log_decode = loglevel;
+	log_level log_slimproto = loglevel;
 
-	PaOpenSLES_ENABLED = use_opensles;
-	PaAAudio_ENABLED = !use_opensles;
+	if (!force_opensles && LibAAudio_init()) {
+		PaOpenSLES_ENABLED = 0;
+		PaAAudio_ENABLED = 1;
+		LOG_DEBUG("Using AAudio");
+	} else {
+		PaOpenSLES_ENABLED = 1;
+		PaAAudio_ENABLED = 0;
+		LOG_DEBUG("Using OpenSL ES");
+	}
 
 	if (mac_str) {
 		int byte = 0;

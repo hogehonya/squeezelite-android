@@ -1,7 +1,7 @@
 /*
  *  Squeezelite Android
  *
- *  (c) Craig Drummond 2025 <craig.p.drummond@gmail.com>
+ *  (c) Craig Drummond 2025-2026 <craig.p.drummond@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,6 @@ import androidx.annotation.RequiresPermission;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -55,7 +54,7 @@ public class Utils {
             debug("Notifs are disabled");
             return false;
         }
-        if (channelId != null) {
+        if (channelId != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationManager mgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel channel = mgr.getNotificationChannel(channelId);
             if (null!=channel) {
@@ -91,7 +90,7 @@ public class Utils {
 
     public static class BtDevice implements Comparable {
         public BtDevice(String name, String mac) {
-            this.name = name != null ? name : "";
+            this.name = name;
             this.mac = mac;
         }
         public String name;
@@ -99,9 +98,13 @@ public class Utils {
 
         @Override
         public int compareTo(Object o) {
-            BtDevice other = (BtDevice) o;
-            String otherName = other.name != null ? other.name : "";
-            return name.compareTo(otherName);
+            if (null==name) { // Should never happen, but...
+                if (null==mac) {
+                    return -1;
+                }
+                return mac.compareTo(((BtDevice)o).mac);
+            }
+            return name.compareTo(((BtDevice)o).name);
         }
     }
 
@@ -113,10 +116,25 @@ public class Utils {
                 return alias;
             }
         }
-        return dev.getName();
+
+        String name = dev.getName();
+        if (!isEmpty(name)) {
+            return name;
+        }
+
+        String mac = dev.getAddress();
+        if (!isEmpty(mac)) {
+            return mac;
+        }
+        return "?";
     }
 
     public static BtDevice getConnectedDevice(Context context) {
+        return getConnectedDevice(context, null, null);
+    }
+
+    // First connected device whose MAC is in macs (any, if null), other than exceptMac
+    public static BtDevice getConnectedDevice(Context context, Set<String> macs, String exceptMac) {
         BluetoothManager btManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
             Method isConnectedMethod;
@@ -129,6 +147,10 @@ public class Utils {
             }
             Set<BluetoothDevice> bonded = btManager.getAdapter().getBondedDevices();
             for (BluetoothDevice dev: bonded) {
+                String mac = dev.getAddress();
+                if ((null!=macs && !macs.contains(mac)) || (null!=exceptMac && exceptMac.equals(mac))) {
+                    continue;
+                }
                 try {
                     if ((boolean) isConnectedMethod.invoke(dev, (Object[]) null)) {
                         return new BtDevice(getName(dev), dev.getAddress());

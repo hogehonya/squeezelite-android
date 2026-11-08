@@ -2,7 +2,7 @@
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
- *      Ralph Irving 2015-2025, ralph_irving@hotmail.com
+ *      Ralph Irving 2015-2026, ralph_irving@hotmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -247,6 +247,11 @@ frames_t _output_frames(frames_t avail) {
 							gainR = output.gainR;
 							if (output.invert) { gainL = -gainL; gainR = -gainR; }
 							cross_ptr = (s32_t *)(output.fade_end + cur_f * BYTES_PER_FRAME);
+#ifdef ANDROID
+							if (cross_ptr >= (s32_t *)outputbuf->wrap) {
+								cross_ptr -= outputbuf->size / BYTES_PER_FRAME * 2;
+							}
+#endif
 						} else {
 							LOG_INFO("unable to continue crossfade - too few samples");
 							output.fade = FADE_INACTIVE;

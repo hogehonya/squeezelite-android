@@ -2,7 +2,7 @@
 /*
  *  Squeezelite Android
  *
- *  (c) Craig Drummond 2025 <craig.p.drummond@gmail.com>
+ *  (c) Craig Drummond 2025-2026 <craig.p.drummond@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,6 +76,13 @@
             android:title="@string/stream_buffer"
             app:iconSpaceReserved="false"
             app:singleLineTitle="false"/>
+
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="use_opensles"
+            app:summary="@string/use_opensles_summary"
+            app:title="@string/use_opensles"
+            app:singleLineTitle="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -95,6 +102,12 @@
             app:singleLineTitle="false"/>
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
+            app:key="stop_on_power_off"
+            app:summary="@string/stop_on_power_off_summary"
+            app:title="@string/stop_on_power_off"
+            app:singleLineTitle="false"/>
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
             app:key="use_wake_lock"
             app:summary="@string/use_wake_lock_summary"
             app:title="@string/use_wake_lock"
@@ -105,6 +118,14 @@
             app:summary="@string/start_on_boot_summary"
             app:title="@string/start_on_boot"
             app:singleLineTitle="false"/>
+        <ListPreference
+            android:entries="@array/delay"
+            android:entryValues="@array/delayAlias"
+            android:key="start_on_boot_delay"
+            android:title="@string/start_on_boot_delay"
+            app:singleLineTitle="false"
+            android:singleLineTitle="false"
+            app:iconSpaceReserved="false" />
         <ListPreference
             android:entries="@array/duration"
             android:entryValues="@array/durationAlias"
@@ -121,14 +142,6 @@
             app:singleLineTitle="false"
             android:singleLineTitle="false"
             app:iconSpaceReserved="false" />
-        <ListPreference
-            android:entries="@array/output"
-            android:entryValues="@array/outputAlias"
-            android:key="output_lib"
-            android:title="@string/output_lib"
-            app:iconSpaceReserved="false"
-            app:singleLineTitle="false"
-            android:singleLineTitle="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -142,6 +155,12 @@
             app:singleLineTitle="false"/>
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
+            app:key="send_track_details"
+            app:summary="@string/send_track_details_summary"
+            app:title="@string/send_track_details"
+            app:singleLineTitle="false"/>
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
             app:key="autostart_bt"
             app:summary="@string/autostart_bt_summary"
             app:title="@string/autostart_bt"
@@ -152,6 +171,12 @@
             app:iconSpaceReserved="false"
             app:singleLineTitle="false"
             android:singleLineTitle="false"/>
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="autostop_bt"
+            app:summary="@string/autostop_bt_summary"
+            app:title="@string/autostop_bt"
+            app:singleLineTitle="false"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

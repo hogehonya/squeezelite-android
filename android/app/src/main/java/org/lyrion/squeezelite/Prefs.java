@@ -1,7 +1,7 @@
 /*
  *  Squeezelite Android
  *
- *  (c) Craig Drummond 2025 <craig.p.drummond@gmail.com>
+ *  (c) Craig Drummond 2025-2026 <craig.p.drummond@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,16 +40,20 @@ public class Prefs {
     public static final String VOLUME_CONTROL_KEY = "volume_control";
     public static final String CONNECTION_LOST_TIMEOUT_KEY = "connection_lost_timeout";
     public static final String INITIAL_CONNECTION_TIMEOUT_KEY = "initial_connection_timeout";
-    public static final String OUTPUT_LIB_KEY = "output_lib";
     public static final String VOLUME_KEY = "volume";
     public static final String RESTORE_VOLUME_KEY = "restore_volume";
     public static final String MAX_BITRATE_KEY = "max_bitrate";
     public static final String MAX_BITRATE_WHEN_KEY = "max_bitrate_when";
     public static final String STREAM_BUFFER_KEY = "stream_buffer";
+    public static final String USE_OPENSLES_KEY = "use_opensles";
     public static final String START_ON_BOOT_KEY = "start_on_boot";
+    public static final String START_ON_BOOT_DELAY_KEY = "start_on_boot_delay";
+    public static final String STOP_ON_POWER_OFF_KEY = "stop_on_power_off";
     public static final String AUTOSTART_BT_KEY = "autostart_bt";
+    public static final String AUTOSTOP_BT_KEY = "autostop_bt";
     public static final String BT_MAC_ADDRESSES_KEY = "bt_mac_addresses";
     public static final String USE_BT_ID_KEY = "use_bt_id";
+    public static final String SEND_TRACK_DETAILS_KEY = "send_track_details";
     public static int MAX_BITRATE_ALWAYS = 0;
     public static int MAX_BITRATE_WHEN_CELLULAR = 1;
     public static int MAX_BITRATE_WHEN_METERED = 2;
@@ -57,13 +61,10 @@ public class Prefs {
     public static final String VOLUME_CONTROL_SEPARATE = "separate";
     public static final String VOLUME_CONTROL_DEVICE = "device";
     public static final String VOLUME_CONTROL_SYNCHRONIZED = "synchronized";
-    public static final String OUTPUT_LIB_OPENSLES = "opensles";
-    public static final String OUTPUT_LIB_AAUDIO = "aaudio";
     public static final String DEFAULT_PLAYER_NAME = "Squeezelite";
     public static final String DEFAULT_PLAYER_MAC = "01:02:03:04:05:06";
     public static final String DEFAULT_CONNECTION_LOST_TIMEOUT = "60";
     public static final String DEFAULT_INITIAL_CONNECTION_TIMEOUT = "0";
-    public static final String DEFAULT_OUTPUT_LIB = OUTPUT_LIB_AAUDIO;
     public static boolean DEFAULT_START_SERVICE = false;
     public static boolean DEFAULT_USE_WAKE_LOCK = false;
     public static String DEFAULT_VOLUME_CONTROL = VOLUME_CONTROL_SYNCHRONIZED;
@@ -71,7 +72,11 @@ public class Prefs {
     public static String DEFAULT_MAX_BITRATE = "-1";
     public static String DEFAULT_MAX_BITRATE_WHEN = String.valueOf(MAX_BITRATE_WHEN_EITHER);
     public static String DEFAULT_STREAM_BUFFER = "0";
+    public static boolean DEFAULT_USE_OPENSLES = false;
     public static boolean DEFAULT_START_ON_BOOT = false;
+    public static String DEFAULT_START_ON_BOOT_DELAY = "0";
+    public static boolean DEFAULT_STOP_ON_POWER_OFF = true;
+    public static boolean DEFAULT_SEND_TRACK_DETAILS = true;
 
     static public SharedPreferences get(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -125,12 +130,6 @@ public class Prefs {
             }
             editor.putString(INITIAL_CONNECTION_TIMEOUT_KEY, DEFAULT_INITIAL_CONNECTION_TIMEOUT);
         }
-        if (!sharedPreferences.contains(OUTPUT_LIB_KEY)) {
-            if (null==editor) {
-                editor = sharedPreferences.edit();
-            }
-            editor.putString(OUTPUT_LIB_KEY, DEFAULT_OUTPUT_LIB);
-        }
         if (!sharedPreferences.contains(RESTORE_VOLUME_KEY)) {
             if (null==editor) {
                 editor = sharedPreferences.edit();
@@ -155,17 +154,47 @@ public class Prefs {
             }
             editor.putString(STREAM_BUFFER_KEY, DEFAULT_STREAM_BUFFER);
         }
+        if (!sharedPreferences.contains(USE_OPENSLES_KEY)) {
+            if (null==editor) {
+                editor = sharedPreferences.edit();
+            }
+            editor.putBoolean(USE_OPENSLES_KEY, DEFAULT_USE_OPENSLES);
+        }
         if (!sharedPreferences.contains(START_ON_BOOT_KEY)) {
             if (null==editor) {
                 editor = sharedPreferences.edit();
             }
             editor.putBoolean(START_ON_BOOT_KEY, DEFAULT_START_ON_BOOT);
         }
+        if (!sharedPreferences.contains(START_ON_BOOT_DELAY_KEY)) {
+            if (null==editor) {
+                editor = sharedPreferences.edit();
+            }
+            editor.putString(START_ON_BOOT_DELAY_KEY, DEFAULT_START_ON_BOOT_DELAY);
+        }
         if (!sharedPreferences.contains(AUTOSTART_BT_KEY)) {
             if (null==editor) {
                 editor = sharedPreferences.edit();
             }
             editor.putBoolean(AUTOSTART_BT_KEY, false);
+        }
+        if (!sharedPreferences.contains(AUTOSTOP_BT_KEY)) {
+            if (null==editor) {
+                editor = sharedPreferences.edit();
+            }
+            editor.putBoolean(AUTOSTOP_BT_KEY, false);
+        }
+        if (!sharedPreferences.contains(STOP_ON_POWER_OFF_KEY)) {
+            if (null==editor) {
+                editor = sharedPreferences.edit();
+            }
+            editor.putBoolean(STOP_ON_POWER_OFF_KEY, DEFAULT_STOP_ON_POWER_OFF);
+        }
+        if (!sharedPreferences.contains(SEND_TRACK_DETAILS_KEY)) {
+            if (null==editor) {
+                editor = sharedPreferences.edit();
+            }
+            editor.putBoolean(SEND_TRACK_DETAILS_KEY, DEFAULT_SEND_TRACK_DETAILS);
         }
         if (editor!=null) {
             editor.apply();

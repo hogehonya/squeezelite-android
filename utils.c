@@ -2,7 +2,7 @@
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
- *      Ralph Irving 2015-2025, ralph_irving@hotmail.com
+ *      Ralph Irving 2015-2026, ralph_irving@hotmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,6 +120,16 @@ u32_t gettime_ms(void) {
 	gettimeofday(&tv, NULL);
 	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 #endif
+}
+
+bool is_mac_nz(u8_t* mac) {
+	int ix;
+	for(ix=0; ix<6; ++ix) {
+		if (mac[ix]) {
+			return true;
+		}
+	}
+	return false;
 }
 
 // mac address

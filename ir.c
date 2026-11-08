@@ -2,7 +2,7 @@
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
- *      Ralph Irving 2015-2025, ralph_irving@hotmail.com
+ *      Ralph Irving 2015-2026, ralph_irving@hotmail.com
  *  
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ static u32_t ir_key_map(const char *c, const char *r) {
 	return 0;
 }
 
-static void *ir_thread() {
+static void *ir_thread(void *vargp) {
 	char *code;
 	
 	while (fd > 0 && LIRC(i, nextcode, &code) == 0) {

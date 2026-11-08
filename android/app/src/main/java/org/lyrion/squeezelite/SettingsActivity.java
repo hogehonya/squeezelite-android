@@ -1,3 +1,23 @@
+/*
+ *  Squeezelite Android
+ *
+ *  (c) Craig Drummond 2025-2026 <craig.p.drummond@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package org.lyrion.squeezelite;
 
 import android.Manifest;
@@ -6,16 +26,17 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
-import android.widget.ArrayAdapter;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresPermission;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -28,7 +49,6 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,6 +77,20 @@ public class SettingsActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.settings, fragment)
                 .commit();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.colorBackground)))   ;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -199,11 +233,11 @@ public class SettingsActivity extends AppCompatActivity {
             updateSummary(Prefs.VOLUME_CONTROL_KEY);
             updateSummary(Prefs.INITIAL_CONNECTION_TIMEOUT_KEY);
             updateSummary(Prefs.CONNECTION_LOST_TIMEOUT_KEY);
-            updateSummary(Prefs.OUTPUT_LIB_KEY);
             updateSummary(Prefs.MAX_BITRATE_KEY);
             updateSummary(Prefs.MAX_BITRATE_WHEN_KEY);
             updateSummary(Prefs.STREAM_BUFFER_KEY);
             updateSummary(Prefs.BT_MAC_ADDRESSES_KEY);
+            updateSummary(Prefs.START_ON_BOOT_DELAY_KEY);
             PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
         }
 
@@ -228,6 +262,10 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             } else if (Prefs.AUTOSTART_BT_KEY.equals(key)) {
                 if (sharedPreferences.getBoolean(Prefs.AUTOSTART_BT_KEY, false)) {
+                    activity.checkBtPermission();
+                }
+            } else if (Prefs.AUTOSTOP_BT_KEY.equals(key)) {
+                if (sharedPreferences.getBoolean(Prefs.AUTOSTOP_BT_KEY, false)) {
                     activity.checkBtPermission();
                 }
             } else {
@@ -304,18 +342,23 @@ public class SettingsActivity extends AppCompatActivity {
 
             SwitchPreferenceCompat useIdPref = getPreferenceManager().findPreference(Prefs.USE_BT_ID_KEY);
             SwitchPreferenceCompat autoStartPref = getPreferenceManager().findPreference(Prefs.AUTOSTART_BT_KEY);
+            SwitchPreferenceCompat autoStopPref = getPreferenceManager().findPreference(Prefs.AUTOSTOP_BT_KEY);
 
-            if (useIdPref==null || useIdPref.isChecked() || autoStartPref==null || autoStartPref.isChecked()) {
+            if (useIdPref==null || useIdPref.isChecked() || autoStartPref==null || autoStartPref.isChecked() || autoStopPref==null || autoStopPref.isChecked()) {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(Prefs.USE_BT_ID_KEY, false);
                 editor.putBoolean(Prefs.AUTOSTART_BT_KEY, false);
+                editor.putBoolean(Prefs.AUTOSTOP_BT_KEY, false);
                 editor.apply();
                 if (useIdPref != null && useIdPref.isChecked()) {
                     useIdPref.setChecked(false);
                 }
                 if (autoStartPref != null && autoStartPref.isChecked()) {
                     autoStartPref.setChecked(false);
+                }
+                if (autoStopPref != null && autoStopPref.isChecked()) {
+                    autoStopPref.setChecked(false);
                 }
             }
         }
@@ -338,7 +381,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (!pairedDevices.isEmpty()) {
                 names = new CharSequence[pairedDevices.size()];
                 macs = new CharSequence[pairedDevices.size()];
-                List<Utils.BtDevice> devs = new LinkedList<Utils.BtDevice>();
+                List<Utils.BtDevice> devs = new LinkedList<>();
                 for (BluetoothDevice bt : pairedDevices) {
                     devs.add(new Utils.BtDevice(Utils.getName(bt), bt.getAddress()));
                 }
@@ -387,7 +430,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if (requestCode == PERMISSION_BLUETOOTH_CONNECT_COMPLETED) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                fillBtMacAddressList((MultiSelectListPreference)fragment.getPreferenceManager().findPreference(Prefs.BT_MAC_ADDRESSES_KEY), this);
+                fillBtMacAddressList(fragment.getPreferenceManager().findPreference(Prefs.BT_MAC_ADDRESSES_KEY), this);
             } else {
                 fragment.disableBt();
             }

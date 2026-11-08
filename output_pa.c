@@ -2,7 +2,7 @@
  *  Squeezelite - lightweight headless squeezebox emulator
  *
  *  (c) Adrian Smith 2012-2015, triode1@btinternet.com
- *      Ralph Irving 2015-2025, ralph_irving@hotmail.com
+ *      Ralph Irving 2015-2026, ralph_irving@hotmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -224,8 +224,7 @@ bool test_open(const char *device, unsigned rates[], bool userdef_rates) {
 			case paInvalidSampleRate:
 				LOG_DEBUG("sample rate %u not supported", ref[i]);
 				continue;
-#if WIN
-#ifndef PA18API
+#if WIN && !defined (PA18API)
 			/* Ignore these errors for device probe */
 			case paUnanticipatedHostError:
 				continue;
@@ -233,6 +232,10 @@ bool test_open(const char *device, unsigned rates[], bool userdef_rates) {
 			case paInvalidDevice:
 				continue;
 #endif
+#if SUN && defined (PA18API)
+			/* Ignore this error during device probe */
+			case paHostError:
+				continue;
 #endif
 			case paNoError:
 				Pa_CloseStream(pa.stream);
@@ -243,7 +246,7 @@ bool test_open(const char *device, unsigned rates[], bool userdef_rates) {
 
 			default:	
 				/* Any other error is a failure */
-				LOG_WARN("error opening portaudio stream: %s", Pa_GetErrorText(err));
+				LOG_WARN("error opening portaudio stream: %s (%d)", Pa_GetErrorText(err), err);
 				return false;
 		}
 	}
@@ -295,10 +298,12 @@ static void *pa_monitor() {
 		} else {
 			// this is a hack to partially support hot plugging of devices
 			// we rely on terminating and reinitalising PA to get an updated list of devices and use name for output.device
+#ifndef ANDROID
 			LOG_INFO("probing device %s", output.device);
 			Pa_Terminate();
 			Pa_Initialize();
 			pa.stream = NULL;
+#endif
 			if (pa_device_id(output.device) != -1) {
 				LOG_INFO("device reopen");
 				break;
@@ -333,9 +338,16 @@ void _pa_open(void) {
 
 #endif
 	if (pa.stream) {
-		if ((err = Pa_CloseStream(pa.stream)) != paNoError) {
+		PaStream *old_stream = pa.stream;
+		pa.stream = NULL;
+
+		// Pa_CloseStream can wait for an in-flight data callback, which needs this
+		// mutex - so never close the stream while holding it
+		UNLOCK;
+		if ((err = Pa_CloseStream(old_stream)) != paNoError) {
 			LOG_WARN("error closing stream: %s", Pa_GetErrorText(err));
 		}
+		LOCK;
 	}
 
 	if (output.state == OUTPUT_OFF) {
@@ -466,7 +478,7 @@ static int _write_frames(frames_t out_frames, bool silence, s32_t gainL, s32_t g
 			_apply_cross(outputbuf, out_frames, cross_gain_in, cross_gain_out, cross_ptr);
 		}
 		
-		if (gainL != FIXED_ONE || gainR!= FIXED_ONE) {
+		if (gainL != FIXED_ONE || gainR != FIXED_ONE || (flags & (MONO_LEFT | MONO_RIGHT))) {
 			_apply_gain(outputbuf, out_frames, gainL, gainR, flags);
 		}
 
