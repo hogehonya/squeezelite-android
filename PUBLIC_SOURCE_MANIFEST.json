@@ -1,6 +1,6 @@
 {
   "archive_prefix": "squeezelite-source/",
-  "commit": "2ef94450d060fd31b1b9a8fe39cb1205cc23253f",
+  "commit": "5166847c04a968ba7dd1423bb85613c0d16e6a98",
   "excluded": [
     {
       "path": "CLAUDE.md",
@@ -95,8 +95,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "819023a909ec715485567a76c1d478072aeeb2ff8d0ab05789bb19a3647b669b",
-      "size": 4228
+      "sha256": "51eee4c35232c959b7a3c5edc4a68b66af8200796ea393c46df3c654aeafb4c0",
+      "size": 4355
     },
     {
       "path": "SITEMAP.md",

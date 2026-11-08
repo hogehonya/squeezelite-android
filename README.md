@@ -78,6 +78,7 @@ APKを配布するときは、対応するsource snapshotと通知文を同時�
 | Lenovo ThinkSmart View (CD-18781Y) `.60` / `.61` / `.62` | LineageOS 15.1（Android 8.1 / API 27） | armeabi-v7a | 0.6.1/601（2026-03ビルド）導入済み。Lyrion接続・再生を確認 |
 | Pixel 7 | Android 17 / API 37 | arm64-v8a | 0.6.1/601（2026-11-04ビルド）上書き導入・起動。Lyrion検出/接続、AAudio 44.1kHz/2chの非無音出力を確認（聴感は未確認） |
 | arrows F-52G | Android 16（API 36） | arm64-v8a | 0.6.1/601（2026-11-08）上書き導入。起動・再生は未確認 |
+| arrows F-52E | Android 16（API 36） | arm64-v8a | 0.6.1/601（2026-11-08）上書き導入。起動・再生は未確認 |
 
 ### 既知の制約
 
